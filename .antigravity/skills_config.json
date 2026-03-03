@@ -1,0 +1,120 @@
+{
+    "version": "2.0.0",
+    "proyecto": "Pandeireta App",
+    "skills": [
+        {
+            "id": "notacion-tradicional",
+            "nombre": "Skill de Notación Tradicional",
+            "descripcion": "Traduce patrones rítmicos de tutoriales a la notación estándar de la app.",
+            "simbolos": {
+                "ti": "Golpe hacia adelante",
+                "co": "Golpe de pulgar",
+                "TA": "Golpe acentuado o puño (siempre en tiempo fuerte)",
+                "ris": "Riscado (movimiento vibratorio)"
+            },
+            "reglas": [
+                "El separador de golpes individuales es el guión: -",
+                "El separador de compases es la barra vertical: |",
+                "Un riscado SIEMPRE debe terminar con golpe de pulgar: ris-co",
+                "El primer golpe de cada compás de Muiñeira debe ser TA"
+            ],
+            "patrones": {
+                "muineira_6_8": "TA-ti-co | TA-ti-co",
+                "xota_3_4": "TA-co-ti | TA-co-ti",
+                "foliada_3_8": "TA-ris-co | TA-ris-co",
+                "maneo_bergan": "TA-ti-ris-co | TA-ti-ris-co"
+            },
+            "implementacion": "/src/skills/notacion-tradicional.js"
+        },
+        {
+            "id": "ingesta-ocr",
+            "nombre": "Skill de Ingesta OCR y Análisis de Documentos",
+            "descripcion": "Procesa fotos, PDFs y documentos Word para extraer letras y ritmos al cancionero.",
+            "formatos_entrada": [
+                "jpg",
+                "png",
+                "pdf",
+                "docx"
+            ],
+            "pipeline": [
+                "1. OCR del documento fuente (extraer texto en bruto)",
+                "2. Identificar bloque de letra (coplas, estribillos)",
+                "3. Detectar marcas de ritmo o indicaciones de género musical",
+                "4. Clasificar género: Jota, Muiñeira, Maneo de Bergantiños, Foliada, Alborada",
+                "5. Estructurar en JSON y guardar en /data/processed/"
+            ],
+            "generos_detectables": [
+                "Jota",
+                "Muiñeira",
+                "Maneo de Bergantiños",
+                "Foliada",
+                "Alborada",
+                "Pasodoble",
+                "Vals"
+            ],
+            "salida": {
+                "formato": "JSON",
+                "destino": "/data/processed/cancionero.json",
+                "campos": [
+                    "titulo",
+                    "coplas",
+                    "ritmo",
+                    "region",
+                    "tags",
+                    "fuente"
+                ]
+            },
+            "implementacion": "/src/skills/ingesta-ocr.js"
+        },
+        {
+            "id": "memoria-historica",
+            "nombre": "Skill de Memoria Histórica y Antropología",
+            "descripcion": "Provee contexto cultural y etnográfico sobre la tradición de la pandeireta en Galicia.",
+            "fuentes_conocimiento": [
+                "/docs/antropologia.md",
+                "/docs/organologia.md"
+            ],
+            "temas": [
+                "Resistencia de las bertorelleiras durante la dictadura franquista",
+                "Las 'cociñas' como espacio de transmisión oral clandestina",
+                "Evolución desde las 'recollidas' antiguas hasta la escena actual",
+                "Referentes modernos: Tanxugueiras, Xavier Díaz e as Afoutesas, Mercedes Peón",
+                "El rol de la mujer como custodio del repertorio tradicional"
+            ],
+            "funcion_en_app": "Enriquecer la 'ficha-cancion' con notas_etnograficas y contexto histórico",
+            "implementacion": "/src/skills/memoria-historica.js"
+        },
+        {
+            "id": "deteccion-ritmica",
+            "nombre": "Skill de Detección Rítmica (Shazam Rítmico)",
+            "descripcion": "Analiza audio para identificar la métrica, el pulso base (tierra) y si el ritmo es binario o ternario.",
+            "entrada": "archivo de audio (mp3, wav, ogg) o fragmento en tiempo real",
+            "analisis": {
+                "tierra": "Localizar el primer pulso fuerte del compás (downbeat)",
+                "metrica": "Determinar si es binario (2/4, 4/4) o ternario (3/4, 3/8, 6/8)",
+                "bpm": "Calcular tempo aproximado en pulsaciones por minuto",
+                "genero_probable": "Mapear resultado a géneros conocidos (Muiñeira → 6/8 ~100 BPM)"
+            },
+            "salida": {
+                "tierra": "string (ej: 'pulso 1 de 6/8')",
+                "tipo": "'binario' | 'ternario'",
+                "bpm": "number",
+                "genero_probable": "string",
+                "patron_notacion": "string (ej: 'TA-ti-co | TA-ti-co')"
+            },
+            "implementacion": "/src/skills/deteccion-ritmica.js"
+        }
+    ],
+    "estructura_json_cancion": {
+        "titulo": "string",
+        "coplas": "array de strings",
+        "tempo_aproximado": "string (ej: 'Allegro moderato')",
+        "ritmo": "string (ej: '3/8', '6/8')",
+        "patron_notacion": "string (ej: 'TA-ti-co | TA-ti-co')",
+        "instrumentacion": "array (ej: ['pandeireta', 'zanfona', 'gaita'])",
+        "region": "string",
+        "tags": "array de strings",
+        "notas_etnograficas": "string",
+        "fuente": "string (referencia al archivo en /data/raw/)"
+    }
+}

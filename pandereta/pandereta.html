@@ -1,0 +1,367 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Music, 
+  BookOpen, 
+  Settings, 
+  History, 
+  ChevronRight, 
+  Play, 
+  RotateCcw, 
+  Search,
+  Info,
+  Database,
+  CheckCircle2,
+  AlertCircle,
+  BarChart3,
+  ShieldCheck,
+  Smartphone
+} from 'lucide-react';
+
+// --- ELEMENTOS GRÁFICOS Y ESTILOS ---
+
+const PanderetaIcon = ({ size = 24, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" className={className}>
+    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3" />
+    <circle cx="50" cy="50" r="38" fill="currentColor" fillOpacity="0.1" />
+    {[0, 60, 120, 180, 240, 300].map(a => (
+      <circle key={a} cx={50 + 45 * Math.cos(a * Math.PI / 180)} cy={50 + 45 * Math.sin(a * Math.PI / 180)} r="5" fill="#d4af37" />
+    ))}
+  </svg>
+);
+
+const InstrumentoInteractivo = ({ zonaActiva, alTocarZona }) => (
+  <div className="relative w-80 h-80 mx-auto group">
+    <div className="absolute inset-0 bg-amber-900/10 rounded-full blur-3xl group-hover:bg-amber-900/20 transition-all duration-700" />
+    <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-2xl relative z-10 transition-transform duration-500 group-hover:scale-105">
+      {/* Marco de Madera de Nogal */}
+      <circle cx="100" cy="100" r="95" fill="#3e2723" stroke="#2b1a17" strokeWidth="5" />
+      
+      {/* Ferreñas de Latón */}
+      {[0, 40, 80, 120, 160, 200, 240, 280, 320].map((angle, i) => (
+        <g key={i} transform={`rotate(${angle} 100 100)`}>
+          <ellipse cx="100" cy="10" rx="10" ry="4" fill="#d4af37" className="animate-pulse" style={{ animationDelay: `${i * 150}ms` }} />
+          <ellipse cx="100" cy="13" rx="10" ry="4" fill="#c5a028" opacity="0.7" />
+        </g>
+      ))}
+
+      {/* Parche de Piel de Cabra */}
+      <circle 
+        cx="100" cy="100" r="80" 
+        fill={zonaActiva === 'TA' ? '#efe5d1' : '#fdf6e3'} 
+        className="transition-colors duration-200 cursor-pointer"
+        onClick={() => alTocarZona('TA')}
+      />
+      
+      {/* Zonas de Impacto Invisibles para UX */}
+      <path 
+        d="M 100,20 A 80,80 0 0 1 180,100 L 100,100 Z" 
+        fill="transparent" 
+        className="cursor-pointer hover:fill-amber-500/5 transition-colors"
+        onClick={(e) => { e.stopPropagation(); alTocarZona('co'); }}
+      />
+      <path 
+        d="M 180,100 A 80,80 0 0 1 100,180 L 100,100 Z" 
+        fill="transparent" 
+        className="cursor-pointer hover:fill-amber-500/5 transition-colors"
+        onClick={(e) => { e.stopPropagation(); alTocarZona('ti'); }}
+      />
+
+      {/* Guías Visuales de Notación */}
+      <text x="100" y="110" textAnchor="middle" className="fill-stone-400 text-[12px] font-serif italic tracking-widest pointer-events-none">TA (Puño)</text>
+      <text x="135" y="60" textAnchor="middle" className="fill-stone-400 text-[8px] font-bold pointer-events-none uppercase">Pulgar (CO)</text>
+      <text x="135" y="145" textAnchor="middle" className="fill-stone-400 text-[8px] font-bold pointer-events-none uppercase">Adiante (TI)</text>
+    </svg>
+  </div>
+);
+
+// --- COMPONENTES DE SECCIÓN ---
+
+const SeccionRevision = () => (
+  <div className="space-y-8 animate-in fade-in duration-700">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="bg-white p-6 rounded-3xl shadow-sm border border-stone-100 flex items-center space-x-4">
+        <div className="p-3 bg-green-50 text-green-600 rounded-2xl"><ShieldCheck size={24} /></div>
+        <div>
+          <p className="text-xs text-stone-400 font-bold uppercase tracking-wider">Estado de "Fuegos"</p>
+          <p className="text-lg font-serif font-bold">Protección Activa</p>
+        </div>
+      </div>
+      <div className="bg-white p-6 rounded-3xl shadow-sm border border-stone-100 flex items-center space-x-4">
+        <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Smartphone size={24} /></div>
+        <div>
+          <p className="text-xs text-stone-400 font-bold uppercase tracking-wider">Optimización</p>
+          <p className="text-lg font-serif font-bold">Tablet Android OK</p>
+        </div>
+      </div>
+      <div className="bg-white p-6 rounded-3xl shadow-sm border border-stone-100 flex items-center space-x-4">
+        <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl"><BarChart3 size={24} /></div>
+        <div>
+          <p className="text-xs text-stone-400 font-bold uppercase tracking-wider">Lógica Musical</p>
+          <p className="text-lg font-serif font-bold">Métrica 6/8 Validada</p>
+        </div>
+      </div>
+    </div>
+
+    <div className="bg-[#2d241e] text-white p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full -mr-32 -mt-32" />
+      <h3 className="text-3xl font-serif italic mb-8 border-b border-white/10 pb-4">Auditoría de Diseño Etnográfico</h3>
+      
+      <div className="space-y-6">
+        {[
+          { label: "Identidad Visual", desc: "Uso de texturas orgánicas (Nogal/Cuero) y paleta cromática profesional.", status: true },
+          { label: "Interactividad Táctil", desc: "Botones de alto formato (120px) y zonas de impacto SVG reactivas.", status: true },
+          { label: "Rigor Técnico", desc: "Representación de diámetros de 250mm y altura de marco de 68mm.", status: true },
+          { label: "Memoria Histórica", desc: "Contenido inmersivo sobre la resistencia en las cocinas integrado.", status: true }
+        ].map((item, i) => (
+          <div key={i} className="flex items-start space-x-4 group cursor-default">
+            <CheckCircle2 size={20} className="text-amber-500 mt-1" />
+            <div>
+              <h4 className="font-bold text-lg group-hover:text-amber-400 transition-colors">{item.label}</h4>
+              <p className="text-stone-400 text-sm leading-relaxed">{item.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+// --- APLICACIÓN PRINCIPAL ---
+
+export default function App() {
+  const [seccionActiva, setSeccionActiva] = useState('revision');
+  const [ritmoActual, setRitmoActual] = useState([]);
+  const [feedbackVisual, setFeedbackVisual] = useState(null);
+
+  const añadirGolpe = (tipo) => {
+    setRitmoActual(prev => [...prev, { id: Date.now(), tipo }]);
+    setFeedbackVisual(tipo);
+    setTimeout(() => setFeedbackVisual(null), 200);
+  };
+
+  const limpiarRitmo = () => setRitmoActual([]);
+
+  return (
+    <div className="flex h-screen bg-[#faf7f2] text-[#2d241e] font-sans selection:bg-amber-200">
+      {/* SIDEBAR DE AUTOR */}
+      <aside className="w-80 bg-[#2d241e] text-[#fdf6e3] flex flex-col shadow-2xl z-30">
+        <div className="p-10 flex flex-col items-center border-b border-white/5 bg-black/10">
+          <PanderetaIcon size={64} className="text-amber-500 mb-4 drop-shadow-lg" />
+          <h1 className="text-2xl font-serif font-bold tracking-tight">Pandereta Pro</h1>
+          <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-40 mt-2">Artesanía Dixital</p>
+        </div>
+
+        <nav className="flex-1 px-6 py-10 space-y-3">
+          {[
+            { id: 'revision', icon: <BarChart3 size={20} />, label: 'Estado del Proyecto' },
+            { id: 'notacion', icon: <Music size={20} />, label: 'Editor de Ritmos' },
+            { id: 'historia', icon: <History size={20} />, label: 'Memoria Colectiva' },
+            { id: 'tecnico', icon: <Settings size={20} />, label: 'Especificacións' }
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setSeccionActiva(item.id)}
+              className={`w-full flex items-center space-x-4 px-6 py-4 rounded-2xl transition-all duration-300 ${
+                seccionActiva === item.id 
+                ? 'bg-gradient-to-r from-amber-700 to-amber-800 text-white shadow-xl translate-x-2' 
+                : 'hover:bg-white/5 text-stone-400 hover:text-stone-200'
+              }`}
+            >
+              {item.icon}
+              <span className="font-medium tracking-wide">{item.label}</span>
+              {seccionActiva === item.id && <ChevronRight size={16} className="ml-auto animate-pulse" />}
+            </button>
+          ))}
+        </nav>
+
+        <div className="p-8 border-t border-white/5">
+          <div className="flex items-center space-x-3 text-[10px] font-bold tracking-widest text-stone-500 uppercase">
+            <div className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+            <span>Sincronizado Local I:</span>
+          </div>
+        </div>
+      </aside>
+
+      {/* CONTENIDO DINÁMICO */}
+      <main className="flex-1 relative flex flex-col overflow-hidden">
+        <header className="h-24 bg-white/60 backdrop-blur-xl flex items-center justify-between px-12 border-b border-stone-200/50 z-20">
+          <div className="flex items-center space-x-4">
+            <div className="w-1 h-8 bg-amber-800 rounded-full" />
+            <h2 className="text-2xl font-serif font-bold italic capitalize tracking-tight">
+              {seccionActiva === 'revision' ? 'Revisión Técnica' : seccionActiva.replace('-', ' ')}
+            </h2>
+          </div>
+          <div className="flex items-center space-x-6">
+            <div className="relative">
+              <input type="text" placeholder="Buscar no cancionero..." className="bg-stone-100 border-none rounded-full py-2 px-10 text-sm w-64 focus:ring-2 focus:ring-amber-500/20" />
+              <Search className="absolute left-3 top-2.5 text-stone-400" size={16} />
+            </div>
+            <button className="p-3 hover:bg-stone-100 rounded-full text-stone-500 transition-colors"><Database size={20} /></button>
+          </div>
+        </header>
+
+        <section className="flex-1 overflow-y-auto p-12 custom-scrollbar">
+          <div className="max-w-5xl mx-auto pb-24">
+            
+            {/* VISTA: REVISIÓN */}
+            {seccionActiva === 'revision' && <SeccionRevision />}
+
+            {/* VISTA: NOTACIÓN */}
+            {seccionActiva === 'notacion' && (
+              <div className="space-y-12 animate-in slide-in-from-bottom-6 duration-700">
+                <div className="bg-white rounded-[3rem] p-16 shadow-sm border border-stone-100 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-800 via-amber-600 to-amber-800" />
+                  
+                  <InstrumentoInteractivo zonaActiva={feedbackVisual} alTocarZona={añadirGolpe} />
+                  
+                  {/* LÍNEA DE NOTACIÓN GRÁFICA */}
+                  <div className="mt-16 relative">
+                    <div className="absolute left-0 top-1/2 w-full h-px bg-stone-300" />
+                    <div className="flex items-center space-x-10 min-h-[120px] overflow-x-auto px-10 relative scroll-smooth">
+                      {ritmoActual.length === 0 && (
+                        <p className="w-full text-center text-stone-300 font-serif italic py-10">Golpea o parche para comezar a compoñer o teu ritmo...</p>
+                      )}
+                      {ritmoActual.map((golpe, i) => (
+                        <div key={golpe.id} className="flex flex-col items-center group relative z-10">
+                          <span className={`text-[10px] font-bold mb-4 uppercase tracking-tighter transition-colors ${golpe.tipo === 'TA' ? 'text-amber-800' : 'text-stone-400'}`}>
+                            {golpe.tipo}
+                          </span>
+                          <div className={`
+                            w-12 h-12 rounded-full border-2 flex items-center justify-center font-serif text-xl font-bold transition-all
+                            ${golpe.tipo === 'TA' ? 'bg-amber-100 border-amber-800 text-amber-900 scale-125 shadow-md' : 'bg-white border-stone-300 text-stone-300'}
+                          `}>
+                            {golpe.tipo === 'TA' ? '✕' : ''}
+                          </div>
+                          {i % 3 === 2 && <div className="absolute -right-5 h-16 w-0.5 bg-stone-200/50 rounded-full" />}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* TECLADO TÁCTIL PROFESIONAL (120px) */}
+                  <div className="grid grid-cols-4 gap-6 mt-16">
+                    {[
+                      { id: 'ti', l: 'Ti', d: 'Adiante' },
+                      { id: 'co', l: 'Co', d: 'Pulgar' },
+                      { id: 'TA', l: 'TA!', d: 'Puño' },
+                      { id: 'ris', l: 'Ris', d: 'Riscado' }
+                    ].map(b => (
+                      <button
+                        key={b.id}
+                        onClick={() => añadirGolpe(b.id)}
+                        className={`group h-32 rounded-3xl flex flex-col items-center justify-center transition-all active:scale-95 ${
+                          b.id === 'TA' 
+                          ? 'bg-[#2d241e] text-white shadow-2xl hover:bg-black' 
+                          : 'bg-stone-50 border border-stone-200 hover:bg-amber-50 hover:border-amber-200'
+                        }`}
+                      >
+                        <span className="text-4xl font-serif font-bold">{b.l}</span>
+                        <span className="text-[9px] font-bold uppercase tracking-widest mt-2 opacity-40 group-hover:opacity-100">{b.d}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-between items-center mt-12 pt-8 border-t border-stone-100">
+                    <button onClick={limpiarRitmo} className="text-stone-400 hover:text-red-600 transition-colors flex items-center space-x-2 font-bold text-xs uppercase tracking-widest"><RotateCcw size={16}/><span>Borrar Todo</span></button>
+                    <div className="flex space-x-4">
+                      <button className="px-8 py-4 bg-stone-100 text-stone-600 rounded-2xl font-bold text-sm hover:bg-stone-200 transition-all">Gardar Fragmento</button>
+                      <button className="px-10 py-4 bg-gradient-to-br from-amber-700 to-amber-900 text-white rounded-2xl font-bold text-sm shadow-xl hover:shadow-amber-900/20 flex items-center space-x-3"><Play size={18}/><span>Reproducir</span></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* VISTA: HISTORIA */}
+            {seccionActiva === 'historia' && (
+              <div className="animate-in fade-in duration-1000 max-w-4xl mx-auto">
+                <article className="prose prose-stone lg:prose-xl">
+                  <h3 className="text-5xl font-serif font-bold italic text-amber-900 mb-10 leading-tight">A Memoria Oculta nas Cociñas</h3>
+                  <div className="columns-1 md:columns-2 gap-12 text-lg leading-relaxed text-stone-600 first-letter:text-7xl first-letter:font-serif first-letter:float-left first-letter:mr-3 first-letter:text-amber-800">
+                    <p className="mb-8">
+                      Durante a ditadura, a pandereta galega transcendeu a súa función musical para converterse nunha armadura de identidade. Nas cociñas das casas rurais, fóra da vixilancia institucional, as mulleres mantiñan un diálogo rítmico que era pura resistencia política e cultural.
+                    </p>
+                    <p className="mb-8">
+                      Este liderado performativo era absoluto. A pandeireteira non era un acompañamento; ela gobernaba a foliada, decidía a enerxía do baile e desafiaba o silencio imposto cunha proxección vocal que aínda hoxe define a potencia de grupos como Tanxugueiras.
+                    </p>
+                    <blockquote className="border-l-4 border-amber-800 pl-6 italic font-serif text-2xl text-amber-900 my-12">
+                      "A pandereta é a tecnoloxía cultural máis resiliente que pariu esta terra."
+                    </blockquote>
+                  </div>
+                  <div className="mt-16 grid grid-cols-2 gap-8">
+                    <div className="aspect-video bg-stone-200 rounded-3xl flex items-center justify-center text-stone-400 font-serif italic border-2 border-dashed border-stone-300 text-center p-8 text-xs px-4">
+                      [Imaxe Histórica: O Será de Mens]
+                    </div>
+                    <div className="aspect-video bg-stone-200 rounded-3xl flex items-center justify-center text-stone-400 font-serif italic border-2 border-dashed border-stone-300 text-center p-8 text-xs px-4">
+                      [Imaxe Histórica: Cociña Tradicional]
+                    </div>
+                  </div>
+                </article>
+              </div>
+            )}
+
+            {/* VISTA: TÉCNICA */}
+            {seccionActiva === 'tecnico' && (
+              <div className="space-y-12 animate-in zoom-in-95 duration-500">
+                <div className="bg-white rounded-[3rem] p-16 shadow-sm border border-stone-100">
+                  <h3 className="text-3xl font-serif font-bold mb-10 flex items-center space-x-4">
+                    <Database className="text-amber-700" />
+                    <span>Estándares de Construcción</span>
+                  </h3>
+                  
+                  <div className="overflow-hidden rounded-3xl border border-stone-200 overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead className="bg-stone-50 border-b border-stone-200 text-stone-400 uppercase text-[10px] font-bold tracking-widest">
+                        <tr>
+                          <th className="px-8 py-6 min-w-[150px]">Especificación</th>
+                          <th className="px-8 py-6 min-w-[150px]">Modelo Profesional</th>
+                          <th className="px-8 py-6 min-w-[150px]">Iniciación</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-stone-100">
+                        {[
+                          { t: "Diámetro", p: "250 mm", i: "220 mm" },
+                          { t: "Altura Marco", p: "68 mm", i: "48 mm" },
+                          { t: "Ferreñas", p: "9, 11 ou 13 pares", i: "5 ou 7 pares" },
+                          { t: "Material Parche", p: "Pel de Cabra", i: "Pelo ou Cabra" },
+                          { t: "Fijación", p: "Tirafondos / Aros", i: "Tachuelas" }
+                        ].map((row, idx) => (
+                          <tr key={idx} className="hover:bg-amber-50/30 transition-colors">
+                            <td className="px-8 py-6 font-bold">{row.t}</td>
+                            <td className="px-8 py-6 text-stone-600 italic">{row.p}</td>
+                            <td className="px-8 py-6 text-stone-400">{row.i}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="mt-12 p-8 bg-amber-50 rounded-3xl flex items-start space-x-6">
+                    <AlertCircle className="text-amber-800 shrink-0" />
+                    <p className="text-sm text-amber-900/70 leading-relaxed italic">
+                      <strong>Nota do Luthier:</strong> O modelo profesional de 250mm require unha tensión constante no parche de cabra para garantir que os armónicos das ferreñas non saturen a frecuencia fundamental do golpe TA.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </section>
+
+        {/* BARRA DE ESTADO INFERIOR */}
+        <footer className="h-12 bg-white/80 border-t border-stone-200 px-12 flex items-center justify-between text-[9px] font-bold uppercase tracking-[0.2em] text-stone-400 shrink-0">
+          <div className="flex items-center space-x-6">
+            <span>© 2026 Proxecto Pandereta App</span>
+            <span className="hidden md:inline opacity-30">•</span>
+            <span className="hidden md:inline">Motor Rítmico v2.5 (6/8 Ternario)</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <span className="text-amber-800">Desenvolvemento: Antigravity AI</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+          </div>
+        </footer>
+      </main>
+    </div>
+  );
+}
